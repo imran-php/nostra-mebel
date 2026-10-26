@@ -1,6 +1,7 @@
 # NOSTRA — сайт и админка
 
-**Демо:** https://nostra-mebel.netlify.app
+**Сайт:** https://imran-php.github.io/nostra-mebel/ (витрина)  
+**Полная версия с админкой:** https://nostra-mebel.netlify.app
 
 Сайт мебельной студии с каталогом работ, своей админкой, статистикой посещений и редактируемыми документами. Стек: HTML/CSS/JS, Netlify Functions, Netlify Blobs.
 
