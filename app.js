@@ -14,7 +14,7 @@
   /* ---------- media ---------- */
   function src(id, size = "f") {
     if (!id) return "";
-    if (id.startsWith("s:")) return `/nostra-mebel/images/${id.slice(2)}-${size === "t" ? 800 : 1600}.webp`;
+    if (id.startsWith("s:")) return `images/${id.slice(2)}-${size === "t" ? 800 : 1600}.webp`;
     return `/api/media/${encodeURIComponent(id)}${size === "t" ? "?s=t" : ""}`;
   }
   function img(id, alt = "", { size = "t", eager = false, sizes } = {}) {
@@ -41,8 +41,7 @@
   function track(t, id) {
     try {
       const body = JSON.stringify({ t, id, v: visitorId(), ref: t === "view" ? document.referrer : undefined, utm: t === "view" ? new URLSearchParams(location.search).get("utm_source") || undefined : undefined });
-      if (navigator.sendBeacon) navigator.sendBeacon("/api/track", new Blob([body], { type: "text/plain" }));
-      else fetch("/api/track", { method: "POST", body, keepalive: true });
+      /* статистика на GitHub Pages не собирается */
     } catch {}
   }
 
@@ -169,7 +168,7 @@
     $("#copyright").textContent = `© ${new Date().getFullYear()} ${s.brandName || "NOSTRA"}`;
     $("#metaNote").hidden = !s.instagram;
     if (state.docs?.length)
-      $("#footerDocs").innerHTML = '<span class="footer-h">Документы</span>' + state.docs.map((d) => `<a href="/docs/${encodeURIComponent(d.id)}">${esc(d.title)}</a>`).join("");
+      $("#footerDocs").innerHTML = '<span class="footer-h">Документы</span>' + state.docs.map((d) => `<a href="doc.html?id=${encodeURIComponent(d.id)}">${esc(d.title)}</a>`).join("");
     bindContacts();
   }
 
@@ -381,7 +380,7 @@
   /* ---------- load ---------- */
   async function load() {
     try {
-      const r = await fetch("/nostra-mebel/catalog.json");
+      const r = await fetch("api/catalog.json");
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || "Ошибка");
       Object.assign(state, { categories: data.categories || [], items: data.items || [], settings: data.settings || {}, docs: data.docs || [] });

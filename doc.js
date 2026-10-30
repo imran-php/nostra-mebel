@@ -20,8 +20,8 @@
     return out.join("");
   }
 
-  const id = decodeURIComponent(location.pathname.replace(/\/+$/, "").split("/").pop() || "privacy");
-  fetch("/api/doc/" + encodeURIComponent(id))
+  const id = (new URLSearchParams(location.search).get("id") || "privacy");
+  fetch("api/doc/" + encodeURIComponent(id) + ".json")
     .then((r) => r.json().then((d) => ({ ok: r.ok, d })))
     .then(({ ok, d }) => {
       if (!ok) throw new Error(d.error || "Документ не найден");
@@ -30,9 +30,9 @@
       document.querySelectorAll("[data-tagline]").forEach((el) => (el.textContent = d.tagline || "Мебель на заказ"));
       $("#copyright").textContent = `© ${new Date().getFullYear()} ${d.brand || "NOSTRA"}`;
       $("#doc").innerHTML = `<p class="eyebrow">Документы</p><h1>${esc(d.title)}</h1><div class="doc-body">${render(d.text)}</div>`;
-      $("#docNav").innerHTML = (d.docs || []).map((x) => `<a href="/docs/${encodeURIComponent(x.id)}"${x.id === d.id ? ' aria-current="page"' : ""}>${esc(x.title)}</a>`).join("");
+      $("#docNav").innerHTML = (d.docs || []).map((x) => `<a href="doc.html?id=${encodeURIComponent(x.id)}"${x.id === d.id ? ' aria-current="page"' : ""}>${esc(x.title)}</a>`).join("");
     })
     .catch((e) => {
-      $("#doc").innerHTML = `<h1>Документ не найден</h1><p>${esc(e.message)}</p><p><a href="/">Вернуться на главную</a></p>`;
+      $("#doc").innerHTML = `<h1>Документ не найден</h1><p>${esc(e.message)}</p><p><a href="./">Вернуться на главную</a></p>`;
     });
 })();
