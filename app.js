@@ -9,7 +9,13 @@
   const DEFAULT_PHONES = { manager: "+7 938 014-07-08", owner: "+7 989 901-01-41" };
   const ALL = "all";
 
-  const state = { categories: [], items: [], settings: {}, cat: ALL, current: null, photo: 0 };
+  const state = { categories: [], items: [], settings: {}, cat: ALL, sub: ALL, current: null, photo: 0 };
+
+  /* ---------- тексты (меняются в админке: раздел «Тексты») ---------- */
+  const DEF = {};
+  (window.NOSTRA_TEXTS || []).forEach(([, list]) => list.forEach(([k, , d]) => (DEF[k] = d)));
+  const T = (k) => { const v = state.settings.texts?.[k]; return v && String(v).trim() ? v : DEF[k] ?? ""; };
+  const rich = (t) => esc(t).replace(/\*([^*]+)\*/g, "<em>$1</em>");
 
   /* ---------- media ---------- */
   function src(id, size = "f") {
@@ -58,12 +64,12 @@
     $$("[data-phone]").forEach((el) => (el.textContent = phone(el.dataset.phone)));
     $$("[data-wa]").forEach((a) => {
       const who = a.dataset.wa;
-      const text = who === "owner" ? "Здравствуйте! Хочу обсудить сотрудничество с NOSTRA." : "Здравствуйте! Хочу обсудить проект мебели.";
+      const text = who === "owner" ? T("msgTextOwner") : T("msgTextMgr");
       const href = msgLink(who, a.dataset.text || text);
       a.hidden = !href;
       if (!href) return;
       a.href = href;
-      if (!a.classList.contains("icon-btn")) a.textContent = "Написать в " + MSG[msgKind()];
+      if (!a.classList.contains("icon-btn")) a.textContent = T("msgPrefix") + " " + MSG[msgKind()];
     });
   }
 
@@ -84,19 +90,19 @@
   const callDlg = $("#callDlg");
   function openCall(who) {
     const isOwner = who === "owner", s = state.settings, num = phone(who);
-    $("#callKicker").textContent = isOwner ? "Владелец" : "Менеджер";
+    $("#callKicker").textContent = isOwner ? T("callOwnerKicker") : T("callMgrKicker");
     $("#callTitle").textContent = isOwner ? (s.coopTitle || "Сотрудничество") : (s.projectTitle || "Обсудить проект");
     $("#callText").textContent = isOwner ? (s.coopText || "") : (s.projectText || "");
     const a = $("#callNum"); a.textContent = num; a.href = "tel:+" + digits(num);
     const wa = $("#callWa");
-    const href = msgLink(who, isOwner ? "Здравствуйте! Хочу обсудить сотрудничество с NOSTRA." : state.current ? `Здравствуйте! Интересует: «${state.current.title}».` : "Здравствуйте! Хочу обсудить проект мебели.");
+    const href = msgLink(who, isOwner ? T("msgTextOwner") : state.current ? `Здравствуйте! Интересует: «${state.current.title}».` : T("msgTextMgr"));
     wa.hidden = !href;
-    if (href) { wa.href = href; wa.textContent = "Написать в " + MSG[msgKind()]; }
-    $("#callHint").textContent = href ? `Позвоните с телефона или напишите в ${MSG[msgKind()]} — ответим в рабочее время.` : "Позвоните с телефона — ответим в рабочее время.";
+    if (href) { wa.href = href; wa.textContent = T("msgPrefix") + " " + MSG[msgKind()]; }
+    $("#callHint").textContent = T("callHint");
     wa.onclick = () => track("wa_" + who, state.current?.id);
-    $("#callCopy").textContent = "Скопировать номер";
+    $("#callCopy").textContent = T("callCopy");
     $("#callCopy").onclick = async () => {
-      try { await navigator.clipboard.writeText(num); $("#callCopy").textContent = "Номер скопирован ✓"; }
+      try { await navigator.clipboard.writeText(num); $("#callCopy").textContent = T("callCopied"); }
       catch { const r = document.createRange(); r.selectNodeContents(a); getSelection().removeAllRanges(); getSelection().addRange(r); }
     };
     callDlg.hidden = false;
@@ -122,13 +128,23 @@
   /* ---------- render ---------- */
   function applySettings() {
     const s = state.settings;
+    // шрифты
+    const font = ["original", "classic", "warm", "minimal"].includes(s.fontPreset) ? s.fontPreset : "warm";
+    document.documentElement.dataset.font = font;
+    try { localStorage.setItem("nostra-font", font); } catch {}
+    // все надписи
+    $$("[data-t]").forEach((el) => { const v = T(el.dataset.t); if (v) el.innerHTML = rich(v); });
+    $("#metaDesc")?.setAttribute("content", T("seoDescription"));
     $$("[data-s]").forEach((el) => { const v = s[el.dataset.s]; if (v) el.textContent = v; });
     // заголовок: слова в *звёздочках* выделяются курсивом
     if (s.heroTitle) $("#heroTitle").innerHTML = esc(s.heroTitle).replace(/\*([^*]+)\*/g, "<em>$1</em>");
-    $$("[data-brand]").forEach((el) => (el.textContent = s.brandName || "NOSTRA"));
+    $$("[data-brand]").forEach((el) => {
+      if (s.logoImage) el.innerHTML = `<img src="${src(s.logoImage, "t")}" alt="${esc(s.brandName || "NOSTRA")}" />`;
+      else el.textContent = s.brandName || "NOSTRA";
+    });
     $$("[data-tagline]").forEach((el) => (el.textContent = s.tagline || "Мебель на заказ"));
-    $("[data-brand-about]").textContent = "О " + (s.brandName || "NOSTRA");
-    if (s.brandName) document.title = `${s.brandName} — ${(s.tagline || "мебель на заказ").toLowerCase()}`;
+    $("[data-brand-about]").innerHTML = rich(T("aboutTitle") || "О " + (s.brandName || "NOSTRA"));
+    document.title = T("seoTitle") || `${s.brandName || "NOSTRA"} — ${(s.tagline || "мебель на заказ").toLowerCase()}`;
 
     if (s.heroImage) {
       const h = $("#heroImg");
@@ -141,17 +157,17 @@
     const facts = (s.facts || []).filter((f) => f.value && f.label);
     $("#facts").innerHTML = facts.map((f) => `<div><dt>${esc(f.value)}</dt><dd>${esc(f.label)}</dd></div>`).join("");
 
-    const steps = String(s.steps || "").split("\n").map((l) => l.trim()).filter(Boolean).map((l) => {
-      const [t, ...rest] = l.split(/\s+[—–-]\s+/);
-      return { t, d: rest.join(" — ") };
-    });
-    $("#stepsList").innerHTML = steps.map((x) => `<li class="step"><div><strong>${esc(x.t)}</strong>${x.d ? `<span>${esc(x.d)}</span>` : ""}</div></li>`).join("");
+    const steps = (s.stepItems?.length ? s.stepItems : String(s.steps || "").split("\n").map((l) => l.trim()).filter(Boolean).map((l) => {
+      const [title, ...rest] = l.split(/\s+[—–-]\s+/);
+      return { title, text: rest.join(" — ") };
+    })).filter((x) => x.title);
+    $("#stepsList").innerHTML = steps.map((x) => `<li class="step${x.photo ? " has-photo" : ""}">${x.photo ? `<figure class="step-photo">${img(x.photo, x.title, { sizes: "(min-width:1024px) 25vw, 90vw" })}</figure>` : ""}<div><strong>${esc(x.title)}</strong>${x.text ? `<span>${esc(x.text)}</span>` : ""}</div></li>`).join("");
     $("#steps").hidden = !steps.length;
 
     const extra = [];
-    if (s.address) extra.push(`<li><span>Адрес</span><b>${esc(s.address)}</b></li>`);
-    if (s.hours) extra.push(`<li><span>Часы работы</span><b>${esc(s.hours)}</b></li>`);
-    if (s.email) extra.push(`<li><span>Почта</span><a href="mailto:${esc(s.email)}">${esc(s.email)}</a></li>`);
+    if (s.address) extra.push(`<li><span>${esc(T("labelAddress"))}</span><b>${esc(s.address)}</b></li>`);
+    if (s.hours) extra.push(`<li><span>${esc(T("labelHours"))}</span><b>${esc(s.hours)}</b></li>`);
+    if (s.email) extra.push(`<li><span>${esc(T("labelEmail"))}</span><a href="mailto:${esc(s.email)}">${esc(s.email)}</a></li>`);
     if (s.instagram) {
       const url = /^https?:/.test(s.instagram) ? s.instagram : `https://instagram.com/${s.instagram.replace(/^@/, "")}`;
       extra.push(`<li><span>Instagram*</span><a data-insta href="${esc(url)}" target="_blank" rel="noopener">${esc(s.instagram.replace(/^https?:\/\/(www\.)?instagram\.com\//, "@").replace(/\/$/, ""))}</a></li>`);
@@ -168,29 +184,43 @@
     $("#copyright").textContent = `© ${new Date().getFullYear()} ${s.brandName || "NOSTRA"}`;
     $("#metaNote").hidden = !s.instagram;
     if (state.docs?.length)
-      $("#footerDocs").innerHTML = '<span class="footer-h">Документы</span>' + state.docs.map((d) => `<a href="doc.html?id=${encodeURIComponent(d.id)}">${esc(d.title)}</a>`).join("");
+      $("#footerDocs").innerHTML = `<span class="footer-h">${esc(T("footerDocsTitle"))}</span>` + state.docs.map((d) => `<a href="doc.html?id=${encodeURIComponent(d.id)}">${esc(d.title)}</a>`).join("");
     bindContacts();
   }
 
   const furniture = () => state.items.filter((i) => i.kind !== "project");
   const works = () => state.items.filter((i) => i.kind === "project").sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
   const catName = (id) => state.categories.find((c) => c.id === id)?.name || "";
+  const tops = () => state.categories.filter((c) => !c.parent || !state.categories.some((p) => p.id === c.parent));
+  const subsOf = (id) => state.categories.filter((c) => c.parent === id);
+  const topOf = (id) => { const c = state.categories.find((x) => x.id === id); return c?.parent && state.categories.some((p) => p.id === c.parent) ? c.parent : id; };
+  const inCat = (item, id) => item.category === id || topOf(item.category) === id;
 
   function renderCats() {
     const f = furniture();
     const counts = {};
-    f.forEach((i) => (counts[i.category] = (counts[i.category] || 0) + 1));
-    const cats = state.categories.filter((c) => counts[c.id] || c.cover);
-    const list = cats.length ? cats : state.categories;
+    f.forEach((i) => { counts[i.category] = (counts[i.category] || 0) + 1; const t = topOf(i.category); if (t !== i.category) counts[t] = (counts[t] || 0) + 1; });
+    const cats = tops().filter((c) => counts[c.id] || c.cover);
+    const list = cats.length ? cats : tops();
 
     $("#catTiles").innerHTML = list.map((c) => {
-      const cover = c.cover || f.find((i) => i.category === c.id)?.cover;
+      const cover = c.cover || f.find((i) => inCat(i, c.id))?.cover;
       const n = counts[c.id] || 0;
       return `<button class="cat-tile ${cover ? "" : "empty"}" data-cat="${esc(c.id)}">${cover ? img(cover, c.name, { sizes: "45vw" }) : ""}<span>${esc(c.name)}${n ? `<small>${n} ${plural(n, "модель", "модели", "моделей")}</small>` : ""}</span></button>`;
     }).join("");
 
-    const chips = [{ id: ALL, name: "Все", n: f.length }, ...state.categories.filter((c) => counts[c.id]).map((c) => ({ id: c.id, name: c.name, n: counts[c.id] }))];
+    state.counts = counts;
+    const chips = [{ id: ALL, name: T("allChip"), n: f.length }, ...tops().filter((c) => counts[c.id]).map((c) => ({ id: c.id, name: c.name, n: counts[c.id] }))];
     $("#chips").innerHTML = chips.map((c) => `<button class="chip" role="tab" data-chip="${esc(c.id)}" aria-selected="${state.cat === c.id}">${esc(c.name)}<sup>${c.n}</sup></button>`).join("");
+  }
+
+  function renderSubchips() {
+    const box = $("#subchips"), counts = state.counts || {};
+    const subs = state.cat === ALL ? [] : subsOf(state.cat).filter((c) => counts[c.id]);
+    box.hidden = !subs.length;
+    if (!subs.length) { box.innerHTML = ""; return; }
+    box.innerHTML = [{ id: ALL, name: T("subAllChip"), n: counts[state.cat] || 0 }, ...subs.map((c) => ({ id: c.id, name: c.name, n: counts[c.id] }))]
+      .map((c) => `<button class="subchip" role="tab" data-sub="${esc(c.id)}" aria-selected="${state.sub === c.id}">${esc(c.name)}<sup>${c.n}</sup></button>`).join("");
   }
 
   function plural(n, a, b, c) {
@@ -199,18 +229,20 @@
   }
 
   function renderGrid() {
-    const list = furniture().filter((i) => state.cat === ALL || i.category === state.cat);
+    const sel = state.sub !== ALL ? state.sub : state.cat;
+    const list = furniture().filter((i) => sel === ALL || (state.sub !== ALL ? i.category === sel : inCat(i, sel)));
     $$("#chips .chip").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.chip === state.cat)));
-    $("#catalogMeta").textContent = list.length ? `${list.length} ${plural(list.length, "модель", "модели", "моделей")}${state.cat === ALL ? "" : " · " + catName(state.cat)}` : "";
+    renderSubchips();
+    $("#catalogMeta").textContent = list.length ? `${list.length} ${plural(list.length, "модель", "модели", "моделей")}${sel === ALL ? "" : " · " + catName(sel)}` : "";
     if (!list.length) {
       $("#grid").innerHTML = state.cat === ALL
-        ? `<div class="empty-state"><strong>Каталог пополняется</strong>Скоро здесь появятся новые модели. А пока — расскажите, что нужно вам.<br><a class="btn btn-primary" data-call="manager" href="tel:+${digits(phone("manager"))}">Обсудить проект</a></div>`
-        : `<div class="empty-state"><strong>Пока пусто</strong>В этой категории ещё нет моделей.<br><button class="btn btn-outline" data-chip="${ALL}">Показать все</button></div>`;
+        ? `<div class="empty-state"><strong>${esc(T("emptyAllTitle"))}</strong>${esc(T("emptyAllText"))}<br><a class="btn btn-primary" data-call="manager" href="tel:+${digits(phone("manager"))}">${esc(T("heroBtnMain"))}</a></div>`
+        : `<div class="empty-state"><strong>${esc(T("emptyCatTitle"))}</strong>${esc(T("emptyCatText"))}<br><button class="btn btn-outline" data-chip="${ALL}">${esc(T("emptyCatBtn"))}</button></div>`;
       return;
     }
     $("#grid").innerHTML = list.map((i) => `
       <button class="card" data-open="${esc(i.id)}">
-        <div class="card-img">${img(i.cover, i.title, { sizes: "(min-width:1024px) 25vw, (min-width:720px) 33vw, 50vw" })}${(i.photos?.length || 0) > 1 ? `<span class="card-badge">${i.photos.length} фото</span>` : ""}</div>
+        <div class="card-img">${img(i.cover, i.title, { sizes: "(min-width:1024px) 25vw, (min-width:720px) 33vw, 50vw" })}${(i.photos?.length || 0) > 1 ? `<span class="card-badge">${i.photos.length} ${esc(T("worksPhotos"))}</span>` : ""}</div>
         <div><div class="card-cat">${esc(catName(i.category))}</div><div class="card-title">${esc(i.title)}</div></div>
       </button>`).join("");
     observe();
@@ -222,11 +254,11 @@
     $("#works-list").innerHTML = list.map((w) => `
       <button class="work" data-open="${esc(w.id)}">
         ${img(w.cover, w.title, { sizes: "(min-width:1024px) 42vw, 86vw" })}
-        ${(w.photos?.length || 0) > 1 ? `<span class="work-photos">${w.photos.length} фото</span>` : ""}
+        ${(w.photos?.length || 0) > 1 ? `<span class="work-photos">${w.photos.length} ${esc(T("worksPhotos"))}</span>` : ""}
         <div class="work-info">
           <p class="eyebrow">${esc([w.projectType || catName(w.category), w.location, w.year].filter(Boolean).join(" · "))}</p>
           <h3>${esc(w.title)}</h3>
-          ${w.authors ? `<p>Авторы: ${esc(w.authors)}</p>` : ""}
+          ${w.authors ? `<p>${esc(T("worksAuthors"))}: ${esc(w.authors)}</p>` : ""}
         </div>
       </button>`).join("");
     let dots = $(".works-dots");
@@ -246,10 +278,12 @@
   /* ---------- filtering ---------- */
   document.addEventListener("click", (e) => {
     const chip = e.target.closest("[data-chip]");
-    if (chip) { state.cat = chip.dataset.chip; renderGrid(); if (state.cat !== ALL) track("cat", state.cat); return; }
+    if (chip) { state.cat = chip.dataset.chip; state.sub = ALL; renderGrid(); if (state.cat !== ALL) track("cat", state.cat); return; }
+    const sub = e.target.closest("[data-sub]");
+    if (sub) { state.sub = sub.dataset.sub; renderGrid(); if (state.sub !== ALL) track("cat", state.sub); return; }
     const tile = e.target.closest("[data-cat]");
     if (tile) {
-      state.cat = tile.dataset.cat; renderGrid(); track("cat", state.cat);
+      state.cat = tile.dataset.cat; state.sub = ALL; renderGrid(); track("cat", state.cat);
       $("#catalog").scrollIntoView({ behavior: "smooth" });
       const chipEl = $(`[data-chip="${CSS.escape(state.cat)}"]`);
       chipEl?.scrollIntoView({ inline: "center", block: "nearest" });
@@ -274,18 +308,18 @@
     $("#gPrev").hidden = $("#gNext").hidden = photos.length < 2;
 
     const isWork = it.kind === "project";
-    $("#sheetKicker").textContent = isWork ? (it.projectType || "Готовая работа") : catName(it.category) || "Мебель на заказ";
+    $("#sheetKicker").textContent = isWork ? (it.projectType || T("workKicker")) : [catName(topOf(it.category)), topOf(it.category) !== it.category ? catName(it.category) : ""].filter(Boolean).join(" · ") || state.settings.tagline || "Мебель на заказ";
     $("#sheetTitle").textContent = it.title;
-    $("#sheetDesc").innerHTML = paras(it.description || "Мебель на заказ по вашим размерам.");
+    $("#sheetDesc").innerHTML = paras(it.description || T("sheetDefaultDesc"));
     const specs = [
-      ["Категория", isWork ? catName(it.category) : ""],
-      ["Материалы", it.materials],
-      ["Тип объекта", isWork ? "" : it.projectType],
-      ["Где", it.location],
-      ["Год", it.year],
-      ["Авторы", it.authors],
+      [T("specCategory"), isWork ? catName(it.category) : ""],
+      [T("specMaterials"), it.materials],
+      [T("specType"), isWork ? "" : it.projectType],
+      [T("specWhere"), it.location],
+      [T("specYear"), it.year],
+      [T("specAuthors"), it.authors],
     ].filter(([, v]) => v);
-    $("#sheetSpecs").innerHTML = specs.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("");
+    $("#sheetSpecs").innerHTML = specs.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
     $("#sheetWa").dataset.text = `Здравствуйте! Интересует: «${it.title}». Хочу обсудить похожий проект.`;
     bindContacts();
 

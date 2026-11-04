@@ -478,3 +478,39 @@ p { margin: 0; }
   .doc { padding: 56px 64px 64px; }
   .doc-body { max-width: 760px; }
 }
+
+/* ---------- наборы шрифтов (выбираются в админке) ---------- */
+html[data-font="classic"] { --serif: "Oranienbaum", Georgia, "Times New Roman", serif; --display: "Forum", Georgia, serif; --sans: "Inter", -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+html[data-font="classic"] .logo-mark { font-size: 25px; letter-spacing: .34em; margin-right: -.34em; }
+html[data-font="classic"] h1, html[data-font="classic"] h2, html[data-font="classic"] h3 { letter-spacing: -.005em; }
+html[data-font="warm"] { --serif: "Lora", Georgia, "Times New Roman", serif; --display: "Arsenal SC", Georgia, serif; --sans: "Lato", -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+html[data-font="warm"] .logo-mark { font-size: 25px; letter-spacing: .2em; margin-right: -.2em; }
+html[data-font="warm"] h1, html[data-font="warm"] h2, html[data-font="warm"] h3 { letter-spacing: -.025em; }
+html[data-font="minimal"] { --serif: "Inter Display", "Inter", Arial, sans-serif; --display: "Inter Display", "Inter", Arial, sans-serif; --sans: "Inter", -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+html[data-font="minimal"] .logo-mark { font-weight: 300; font-size: 21px; letter-spacing: .46em; margin-right: -.46em; }
+html[data-font="minimal"] h1, html[data-font="minimal"] h2, html[data-font="minimal"] h3 { font-weight: 200; letter-spacing: -.03em; }
+html[data-font="minimal"] h1 em, html[data-font="minimal"] h2 em { font-weight: 300; }
+html[data-font="minimal"] .hero-contacts strong, html[data-font="minimal"] .call-num, html[data-font="minimal"] .facts dt { font-weight: 300; }
+
+/* логотип-картинка */
+.logo-mark img { display: block; height: 32px; width: auto; max-width: 180px; object-fit: contain; }
+.footer .logo-mark img { height: 40px; }
+.header.on-hero:not(.menu-open) .logo-mark img.logo-dark-only { display: none; }
+
+/* подкатегории */
+.subchips { display: flex; gap: 6px; overflow-x: auto; padding: 10px var(--gutter) 0; scrollbar-width: none; }
+.subchips::-webkit-scrollbar { display: none; }
+.subchips[hidden] { display: none; }
+.subchip { flex: none; border: 1px solid var(--line); background: transparent; color: var(--ink-2); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+.subchip[aria-selected="true"] { border-color: var(--ink); color: var(--ink); background: var(--paper); }
+.subchip sup { font-size: 9px; opacity: .6; margin-left: 2px; }
+
+/* этапы с фото */
+.step-photo { order: -1; grid-column: 1 / -1; margin: -18px -18px 4px; aspect-ratio: 4 / 3; overflow: hidden; border-radius: var(--radius) var(--radius) 0 0; background: var(--line); }
+.step-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (min-width: 1024px) {
+  .subchips { padding: 12px 0 0; flex-wrap: wrap; overflow: visible; }
+  .step-photo { margin: -28px -26px 0; }
+}
+/* логотип-картинка на тёмном фоне становится белой */
+.header.on-hero:not(.menu-open) .logo-mark img, .footer .logo-mark img { filter: brightness(0) invert(1); }

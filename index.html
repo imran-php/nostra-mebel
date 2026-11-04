@@ -4,18 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>NOSTRA — мебель на заказ</title>
-  <meta name="description" content="NOSTRA — кухни, шкафы, гардеробные и мебель для дома на заказ по вашим размерам. Каталог и готовые работы." />
+  <meta name="description" id="metaDesc" content="NOSTRA — кухни, шкафы, гардеробные и мебель для дома на заказ по вашим размерам. Каталог и готовые работы." />
   <meta name="theme-color" content="#f5f2ea" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="NOSTRA — мебель на заказ" />
   <meta property="og:description" content="Кухни, шкафы, гардеробные и мебель для дома по вашим размерам." />
   <meta property="og:image" content="images/kitchen-1600.webp" />
+  <script>try{document.documentElement.dataset.font=localStorage.getItem("nostra-font")||"warm"}catch(e){document.documentElement.dataset.font="warm"}</script>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="preload" href="fonts/playfair-display-normal-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="preload" href="fonts/manrope-normal-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="fonts/fonts.css?v=3" />
+  <link rel="stylesheet" href="fonts/fonts.css?v=8" />
   <link rel="preload" as="image" href="images/kitchen-800.webp" media="(max-width: 800px)" />
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=8" />
 </head>
 <body>
   <a class="skip" href="#catalog">К каталогу</a>
@@ -26,14 +25,14 @@
       <span class="logo-sub" data-tagline>Мебель на заказ</span>
     </a>
     <nav class="nav-desktop" aria-label="Разделы">
-      <a href="#catalog">Каталог</a>
-      <a href="#works">Готовые работы</a>
-      <a href="#about">О нас</a>
-      <a href="#contacts">Контакты</a>
+      <a href="#catalog" data-t="navCatalog">Каталог</a>
+      <a href="#works" data-t="navWorks">Готовые работы</a>
+      <a href="#about" data-t="navAbout">О нас</a>
+      <a href="#contacts" data-t="navContacts">Контакты</a>
     </nav>
     <div class="header-actions">
-      <a class="header-phone only-desktop" data-call="manager" href="#"><small>Менеджер</small><strong data-phone="manager"></strong></a>
-      <a class="btn btn-primary btn-sm only-desktop" data-call="manager" href="#">Обсудить проект</a>
+      <a class="header-phone only-desktop" data-call="manager" href="#"><small data-t="headerPhoneLabel">Менеджер</small><strong data-phone="manager"></strong></a>
+      <a class="btn btn-primary btn-sm only-desktop" data-call="manager" href="#" data-t="headerBtn">Обсудить проект</a>
       <a class="icon-btn only-mobile" data-call="manager" href="#" aria-label="Позвонить менеджеру">
         <svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
       </a>
@@ -45,18 +44,18 @@
 
   <div class="menu" id="menu" hidden>
     <nav class="menu-nav" aria-label="Меню">
-      <a href="#catalog">Каталог</a>
-      <a href="#works">Готовые работы</a>
-      <a href="#steps">Как мы работаем</a>
-      <a href="#about">О нас</a>
-      <a href="#contacts">Контакты</a>
+      <a href="#catalog" data-t="navCatalog">Каталог</a>
+      <a href="#works" data-t="navWorks">Готовые работы</a>
+      <a href="#steps" data-t="navSteps">Как мы работаем</a>
+      <a href="#about" data-t="navAbout">О нас</a>
+      <a href="#contacts" data-t="navContacts">Контакты</a>
     </nav>
     <div class="menu-contacts">
       <a class="menu-contact" data-call="manager" href="#">
-        <span>Обсудить проект</span><strong data-phone="manager"></strong>
+        <span data-t="menuMgr">Обсудить проект</span><strong data-phone="manager"></strong>
       </a>
       <a class="menu-contact" data-call="owner" href="#">
-        <span>Сотрудничество</span><strong data-phone="owner"></strong>
+        <span data-t="menuCoop">Сотрудничество</span><strong data-phone="owner"></strong>
       </a>
     </div>
   </div>
@@ -75,33 +74,34 @@
         <div class="hero-cta">
           <a class="btn btn-light" data-call="manager" href="#">
             <svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
-            Обсудить проект
+            <span data-t="heroBtnMain">Обсудить проект</span>
           </a>
-          <a class="btn btn-ghost-light" href="#catalog">Смотреть каталог</a>
+          <a class="btn btn-ghost-light" href="#catalog" data-t="heroBtnCatalog">Смотреть каталог</a>
         </div>
         </div>
         <aside class="hero-contacts" aria-label="Телефоны">
-          <a data-call="manager" href="#"><small>Обсудить проект</small><strong data-phone="manager"></strong><span>Менеджер · расчёт и замер</span></a>
-          <a data-call="owner" href="#"><small>Сотрудничество</small><strong data-phone="owner"></strong><span>Владелец · для партнёров и дизайнеров</span></a>
+          <a data-call="manager" href="#"><small data-t="heroMgrLabel">Обсудить проект</small><strong data-phone="manager"></strong><span data-t="heroMgrNote">Менеджер · расчёт и замер</span></a>
+          <a data-call="owner" href="#"><small data-t="heroCoopLabel">Сотрудничество</small><strong data-phone="owner"></strong><span data-t="heroCoopNote">Владелец · для партнёров и дизайнеров</span></a>
         </aside>
       </div>
     </section>
 
     <section class="section cats-section" aria-labelledby="catsTitle">
       <div class="section-head">
-        <div><p class="eyebrow">Направления</p>
-        <h2 id="catsTitle">Что мы <em>делаем</em></h2></div>
+        <div><p class="eyebrow" data-t="catsEyebrow">Направления</p>
+        <h2 id="catsTitle" data-t="catsTitle">Что мы <em>делаем</em></h2></div>
       </div>
       <div class="cat-tiles" id="catTiles"></div>
     </section>
 
     <section class="section" id="catalog" aria-labelledby="catalogTitle">
       <div class="section-head">
-        <div><p class="eyebrow">Каталог</p>
-        <h2 id="catalogTitle">Мебель</h2></div>
+        <div><p class="eyebrow" data-t="catalogEyebrow">Каталог</p>
+        <h2 id="catalogTitle" data-t="catalogTitle">Мебель</h2></div>
       </div>
       <div class="chips-wrap">
         <div class="chips" id="chips" role="tablist" aria-label="Категории"></div>
+        <div class="subchips" id="subchips" role="tablist" aria-label="Подкатегории" hidden></div>
       </div>
       <p class="catalog-meta" id="catalogMeta" aria-live="polite"></p>
       <div class="grid" id="grid">
@@ -111,17 +111,17 @@
 
     <section class="section works-section" id="works" aria-labelledby="worksTitle">
       <div class="section-head">
-        <div><p class="eyebrow">Портфолио</p>
-        <h2 id="worksTitle">Готовые <em>работы</em></h2></div>
-        <p class="section-lead">Реальные проекты — интерьеры, которые мы уже сделали.</p>
+        <div><p class="eyebrow" data-t="worksEyebrow">Наши проекты</p>
+        <h2 id="worksTitle" data-t="worksTitle">Готовые <em>работы</em></h2></div>
+        <p class="section-lead" data-t="worksLead">Реальные интерьеры, которые мы сделали для наших клиентов.</p>
       </div>
       <div class="works" id="works-list"></div>
     </section>
 
     <section class="section" id="steps" aria-labelledby="stepsTitle">
       <div class="section-head">
-        <div><p class="eyebrow">Процесс</p>
-        <h2 id="stepsTitle">Как мы <em>работаем</em></h2></div>
+        <div><p class="eyebrow" data-t="stepsEyebrow">Процесс</p>
+        <h2 id="stepsTitle" data-t="stepsTitle">Как мы <em>работаем</em></h2></div>
       </div>
       <ol class="steps" id="stepsList"></ol>
     </section>
@@ -129,7 +129,7 @@
     <section class="section about" id="about" aria-labelledby="aboutTitle">
       <div class="about-media"><img id="aboutImg" src="images/living-800.webp" alt="" loading="lazy" /></div>
       <div class="about-body">
-        <p class="eyebrow">О нас</p>
+        <p class="eyebrow" data-t="aboutEyebrow">О нас</p>
         <h2 id="aboutTitle" data-brand-about>О NOSTRA</h2>
         <div class="about-text" id="aboutText"></div>
         <dl class="facts" id="facts"></dl>
@@ -138,12 +138,12 @@
 
     <section class="section contacts" id="contacts" aria-labelledby="contactsTitle">
       <div class="section-head">
-        <div><p class="eyebrow">Контакты</p>
-        <h2 id="contactsTitle">Свяжитесь <em>с нами</em></h2></div>
+        <div><p class="eyebrow" data-t="contactsEyebrow">Контакты</p>
+        <h2 id="contactsTitle" data-t="contactsTitle">Свяжитесь <em>с нами</em></h2></div>
       </div>
       <div class="contact-cards">
         <article class="contact-card contact-card-dark">
-          <p class="eyebrow eyebrow-light">Для клиентов</p>
+          <p class="eyebrow eyebrow-light" data-t="mgrCardEyebrow">Для клиентов</p>
           <h3 data-s="projectTitle">Обсудить проект</h3>
           <p data-s="projectText"></p>
           <a class="btn btn-light btn-block" data-call="manager" href="#">
@@ -151,10 +151,10 @@
             <span data-phone="manager"></span>
           </a>
           <a class="btn btn-ghost-light btn-block" data-wa="manager" href="#" target="_blank" rel="noopener">Написать в WhatsApp</a>
-          <p class="contact-who">Менеджер</p>
+          <p class="contact-who" data-t="mgrCardWho">Менеджер</p>
         </article>
         <article class="contact-card">
-          <p class="eyebrow">Для партнёров</p>
+          <p class="eyebrow" data-t="coopCardEyebrow">Для партнёров</p>
           <h3 data-s="coopTitle">Сотрудничество</h3>
           <p data-s="coopText"></p>
           <a class="btn btn-primary btn-block" data-call="owner" href="#">
@@ -162,7 +162,7 @@
             <span data-phone="owner"></span>
           </a>
           <a class="btn btn-outline btn-block" data-wa="owner" href="#" target="_blank" rel="noopener">Написать в WhatsApp</a>
-          <p class="contact-who">Владелец</p>
+          <p class="contact-who" data-t="coopCardWho">Владелец</p>
         </article>
       </div>
       <ul class="contact-extra" id="contactExtra"></ul>
@@ -175,11 +175,11 @@
       <span data-tagline>Мебель на заказ</span>
     </div>
     <nav class="footer-nav" aria-label="Разделы в подвале">
-      <span class="footer-h">Разделы</span>
-      <a href="#catalog">Каталог</a>
-      <a href="#works">Готовые работы</a>
-      <a href="#about">О нас</a>
-      <a href="#contacts">Контакты</a>
+      <span class="footer-h" data-t="footerNavTitle">Разделы</span>
+      <a href="#catalog" data-t="navCatalog">Каталог</a>
+      <a href="#works" data-t="navWorks">Готовые работы</a>
+      <a href="#about" data-t="navAbout">О нас</a>
+      <a href="#contacts" data-t="navContacts">Контакты</a>
     </nav>
     <nav class="footer-nav" id="footerDocs" aria-label="Документы">
       <span class="footer-h">Документы</span>
@@ -191,7 +191,7 @@
     <div class="footer-legal" id="legal"></div>
     <div class="footer-bottom">
       <span id="copyright">© NOSTRA</span>
-      <span>Информация на сайте не является публичной офертой.</span>
+      <span data-t="footerOffer">Информация на сайте не является публичной офертой.</span>
       <span id="metaNote" hidden>* Instagram принадлежит компании Meta, деятельность которой признана экстремистской и запрещена на территории России.</span>
     </div>
   </footer>
@@ -200,7 +200,7 @@
   <div class="actionbar" id="actionbar" aria-hidden="true">
     <a class="btn btn-primary" data-call="manager" href="#">
       <svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
-      Обсудить проект
+      <span data-t="actionbarBtn">Обсудить проект</span>
     </a>
     <a class="icon-btn icon-btn-wa" data-wa="manager" href="#" target="_blank" rel="noopener" aria-label="Написать менеджеру">
       <svg viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
@@ -232,7 +232,7 @@
       <div class="sheet-cta">
         <a class="btn btn-primary" data-call="manager" href="#">
           <svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
-          Хочу похожее
+          <span data-t="sheetBtn">Хочу похожее</span>
         </a>
         <a class="icon-btn icon-btn-wa" id="sheetWa" data-wa="manager" href="#" target="_blank" rel="noopener" aria-label="Обсудить в мессенджере">
           <svg viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
@@ -250,13 +250,14 @@
       <p id="callText"></p>
       <a class="call-num" id="callNum" data-direct href="#"></a>
       <div class="call-actions">
-        <button class="btn btn-primary" id="callCopy" type="button">Скопировать номер</button>
+        <button class="btn btn-primary" id="callCopy" type="button" data-t="callCopy">Скопировать номер</button>
         <a class="btn btn-outline" id="callWa" data-direct href="#" target="_blank" rel="noopener">Написать в WhatsApp</a>
       </div>
       <p class="call-hint" id="callHint">Позвоните с телефона — ответим в рабочее время.</p>
     </div>
   </div>
 
-  <script src="app.js?v=4" defer></script>
+  <script src="texts.js?v=8" defer></script>
+  <script src="app.js?v=8" defer></script>
 </body>
 </html>
